@@ -12,7 +12,7 @@ kind: Deployment
 metadata:
   name: rotc-db-deployment
   labels:
-    app: rotc-db
+    app: rotc-db-deployment
 spec:
   replicas: 1
   selector:
@@ -38,3 +38,16 @@ spec:
             secretKeyRef:
               name: rotc-secret
               key: db-password
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+spec:
+  type: ClusterIP
+  selector:
+    app: rotc-db
+  ports:
+    - port: 5432
+      targetPort: 5432
