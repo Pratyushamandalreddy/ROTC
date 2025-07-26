@@ -29,10 +29,6 @@ spec:
       labels:
         app: rotc-db
     spec:
-      volumes:
-        - name: postgres-storage
-          persistentVolumeClaim:
-            claimName: postgres-pvc
       containers:
       - name: rotc-db
         image: postgres
@@ -49,9 +45,12 @@ spec:
               name: rotc-secret
               key: db-password
         volumeMounts:
-          - mountPath: /var/lib/postgresql/data
-            name: postgres-storage
-
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-storage
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -114,30 +113,27 @@ spec:
   ports:
   - port: 8000
     targetPort: 8000
-
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: postgres-pv
-  namespace: crud-app
 spec:
   capacity:
     storage: 1Gi
+  storageClassName: local-path
   accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
   hostPath:
-    path: /tmp/postgres-data
-
+    path: /rotc/postgres-data
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: crud-app
 spec:
   accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
