@@ -6,3 +6,35 @@ type: Opaque
 data:
   db-password: QXAwMHJQYSQkdzByZCE=
 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rotc-db-deployment
+  labels:
+    app: rotc-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rotc-db
+  template:
+    metadata:
+      labels:
+        app: rotc-db
+    spec:
+      containers:
+      - name: rotc-db
+        image: postgres
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: postgres
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rotc-secret
+              key: db-password
