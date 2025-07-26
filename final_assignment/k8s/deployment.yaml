@@ -51,3 +51,39 @@ spec:
   ports:
     - port: 5432
       targetPort: 5432
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rotc-app-deployment
+  labels:
+    app: rotc-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rotc-app
+  template:
+    metadata:
+      labels:
+        app: rotc-app
+    spec:
+      containers:
+        - name: rotc-app
+          image: final_assignment-backend
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: db_address
+              value: db
+            - name: db_username
+              value: postgres
+            - name: db_name
+              value: postgres
+            - name: db_password
+              valueFrom:
+                secretKeyRef:
+                  name: rotc-secret
+                  key: db-password
